@@ -114,5 +114,4 @@ def formata_txt(nome_txt):
 
     arquivo_final.close()
 
-
 # fim da função ===================================================
