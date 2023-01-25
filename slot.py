@@ -1,0 +1,1 @@
+# Aqui está armazenado todos os padrões encontados no arquivo txt.
