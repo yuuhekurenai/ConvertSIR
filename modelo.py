@@ -711,3 +711,7 @@ def model_vcp():
     df_concat4 = pd.concat([p31, p32, p33, p34, p35, p36, p37, p38, p39])
     df_geral = pd.concat([df_concat1, df_concat2, df_concat3, df_concat4])
     df_geral.to_excel(f'SIR - MALHA {datetime.date.today()}.xlsx')
+    ler = load_workbook(f'SIR - MALHA {datetime.date.today()}.xlsx')
+    planilha = ler
+    planilha.active.delete_cols(15, 19)
+    ler.save(f'SIR - MALHA {datetime.date.today()}.xlsx')
