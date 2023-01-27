@@ -1,3 +1,5 @@
+from openpyxl import load_workbook, Workbook, writer
+import datetime
 # Importa o arquivo tratado.
 from format_tool import formata_txt
 # Importa o pandas
@@ -49,6 +51,9 @@ def model_vcp():
     df['Karvl'] = df['Arvl-Hora'].astype(str)
     df['Karvl'] = df['Karvl'].str.len()
     df_orig = df
+
+    # Com as Keys geradas, agora é possível buscar todos os padrões e tratá-los.
+
     df_frame45 = df_orig.query('KeyX == 1  & Key == 45 & Kdept == 7').copy()
     df_frame45['FlightNumbeR'] = df_frame45['Arvl Sta']
     df_frame45['Dept Sta'] = base
@@ -706,4 +711,3 @@ def model_vcp():
     df_concat4 = pd.concat([p31, p32, p33, p34, p35, p36, p37, p38, p39])
     df_geral = pd.concat([df_concat1, df_concat2, df_concat3, df_concat4])
     df_geral.to_excel(f'SIR - MALHA {datetime.date.today()}.xlsx')
-    df_geral
