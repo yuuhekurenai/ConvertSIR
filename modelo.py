@@ -1,5 +1,4 @@
 from openpyxl import load_workbook
-from pyxll import xl_macro, xl_app
 
 import datetime
 # Importa o arquivo tratado.
