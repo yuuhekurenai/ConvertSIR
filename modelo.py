@@ -714,4 +714,5 @@ def model_vcp():
     ler = load_workbook(f'SIR - MALHA {datetime.date.today()}.xlsx')
     planilha = ler
     planilha.active.delete_cols(15, 19)
+    planilha.active.delete_cols(1)
     ler.save(f'SIR - MALHA {datetime.date.today()}.xlsx')
