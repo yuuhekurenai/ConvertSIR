@@ -1,4 +1,6 @@
-from openpyxl import load_workbook, Workbook, writer
+from openpyxl import load_workbook
+from pyxll import xl_macro, xl_app
+
 import datetime
 # Importa o arquivo tratado.
 from format_tool import formata_txt
