@@ -1,4 +1,4 @@
-from openpyxl import load_workbook
+from openpyxl import load_workbook, Workbook
 
 import datetime
 # Importa o arquivo tratado.
@@ -711,9 +711,18 @@ def model_vcp():
     df_concat3 = pd.concat([p21, p22, p23, p24, p25, p26, p27, p28, p29, p30])
     df_concat4 = pd.concat([p31, p32, p33, p34, p35, p36, p37, p38, p39])
     df_geral = pd.concat([df_concat1, df_concat2, df_concat3, df_concat4])
+    df_geral = df_geral.sort_index()
+    df_geral['Concatenar'] = df_geral['Arvl Sta'].astype(str) + df_geral['Dept Sta'].astype(str) + df_geral[
+        'Dept Day'].astype(str) + df_geral['Week-Day'].astype(str) + df_geral['Pax-Subfleet'].astype(str) + df_geral[
+                                 'Pax-Subfleet'].astype(str) + df_geral['Arvl-Hora'].astype(str) + df_geral[
+                                 'Dept-Hora'].astype(str) + df_geral['Svc Type'].astype(str) + df_geral[
+                                 'FlightNumbeR'].astype(str) + df_geral['FlightNumberArvl'].astype(str)
+
+    df_geral['Concatenar'] = df_geral['Concatenar'].astype(str)
+    df_geral['Chave'] = df_geral['Concatenar'].str.len()
     df_geral.to_excel(f'SIR - MALHA {datetime.date.today()}.xlsx')
     ler = load_workbook(f'SIR - MALHA {datetime.date.today()}.xlsx')
     planilha = ler
-    planilha.active.delete_cols(15, 19)
-    planilha.active.delete_cols(1)
+    planilha.active.delete_cols(15, 5)
     ler.save(f'SIR - MALHA {datetime.date.today()}.xlsx')
+
