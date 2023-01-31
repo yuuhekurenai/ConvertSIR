@@ -4,16 +4,55 @@
     se utilizada para o dimensionamento de demanda.
 
 """
-from openpyxl import Workbook
+from openpyxl import Workbook, load_workbook
 import datetime
 
-# Nomear colunas conforme a ferramenta de dimensionamento do capacity
+Base = 'VCP'
+time_null = '00:00'
 
-class CriarMalhaDimensionamento:
+"""Nomear colunas conforme a ferramenta de dimensionamento do capacity"""
+
+
+class Sir:
 
     def __init__(self):
-        self.malha = Workbook()
-        self.planilha = self.malha.active
+        # Pequenos parametros
+        self.base = Base
+        self.tempo = time_null
+        self.linha = 2
+        self.coluna = 1
+        self.escrever_coluna = 1
+        self.escrever_linha = 2
+
+        """Carrega a planilha tratada pelo pandas assim atibuindos respectivos valores das colunas"""
+
+        self.malha = load_workbook(f'SIR - MALHA {datetime.date.today()}.xlsx')
+        self.sir = self.malha.active
+        self.dptsta = self.sir.cell(column=self.coluna, row=self.linha)
+        self.coluna += 1
+        self.arlvsta = self.sir.cell(column=self.coluna, row=self.linha)
+        self.coluna += 1
+        self.deptday = self.sir.cell(column=self.coluna, row=self.linha)
+        self.coluna += 1
+        self.arvlday = self.sir.cell(column=self.coluna, row=self.linha)
+        self.coluna += 1
+        self.depttime = self.sir.cell(column=self.coluna, row=self.linha)
+        self.coluna += 1
+        self.arvltime = self.sir.cell(column=self.coluna, row=self.linha)
+        self.coluna += 1
+        self.subfleet = self.sir.cell(column=self.coluna, row=self.linha)
+        self.coluna += 1
+        self.flightnumber = self.sir.cell(column=self.coluna, row=self.linha)
+        self.coluna += 2
+        self.trilho = self.sir.cell(column=self.coluna, row=self.linha)
+        self.coluna += 1
+        self.svctype = self.sir.cell(column=self.coluna, row=self.linha)
+        self.coluna += 1
+        self.weekday = self.sir.cell(column=self.coluna, row=self.linha)
+
+        """Cria e nova planilha e escreve o cabeçalho"""
+
+        self.planilha = self.malha.create_sheet('MALHA', 1)
         self.planilha['A1'] = "Dept Sta"
         self.planilha['B1'] = "Arvl Sta"
         self.planilha['C1'] = "Dept Day"
@@ -26,47 +65,40 @@ class CriarMalhaDimensionamento:
         self.planilha['J1'] = "Svc Type"
         self.planilha['K1'] = "Week Day"
 
-    # Escreve os dados na planilha conforme a coluna e a linha
+        """Extraindo dados da primeira planilha e transformando para o formato Capacity Planning"""
 
 
-class EscreverDados(CriarMalhaDimensionamento):
+class EscreverMalha(Sir):
+
     def __init__(self):
-        super(EscreverDados, self).__init__()
-        coluna = 1
-        linha = 2
+        super().__init__()
+        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.base
+        self.escrever_coluna += 1
+        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.arlvsta.value
+        self.escrever_coluna += 1
+        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.deptday.value
+        self.escrever_coluna += 1
+        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.arvlday.value
+        self.escrever_coluna += 1
+        self.planilha.cell(column=self.escrever_coluna,
+                           row=self.escrever_linha).value = f'{self.deptday.value} {self.depttime.value}'
+        self.escrever_coluna += 1
+        self.planilha.cell(column=self.escrever_coluna,
+                           row=self.escrever_linha).value = f'{self.arvlday.value} {self.tempo}'
+        self.escrever_coluna += 1
+        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.subfleet.value
+        self.escrever_coluna += 1
+        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.flightnumber.value
+        self.escrever_coluna += 1
+        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.trilho.value
+        self.escrever_coluna += 1
+        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.svctype.value
+        self.escrever_coluna += 1
+        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.weekday.value
+        self.escrever_coluna -= 10
+        self.escrever_linha += 1
 
-        deptsta = str('')
-        self.planilha.cell(column=coluna, row=linha).value = deptsta
-        coluna += 1
-        self.arvlsta = str('')
-        self.planilha.cell(column=coluna, row=linha).value = self.arvlsta
-        coluna += 1
-        self.deptday = str('')
-        self.planilha.cell(column=coluna, row=linha).value = self.deptday
-        coluna += 1
-        self.arvlday = str('')
-        self.planilha.cell(column=coluna, row=linha).value = self.arvlday
-        coluna += 1
-        self.depttime = str('')
-        self.planilha.cell(column=coluna, row=linha).value = self.depttime
-        coluna += 1
-        self.arvltime = str('')
-        self.planilha.cell(column=coluna, row=linha).value = self.arvltime
-        coluna += 1
-        self.subfleet = str('')
-        self.planilha.cell(column=coluna, row=linha).value = self.subfleet
-        coluna += 1
-        self.flightnumber = str('')
-        self.planilha.cell(column=coluna, row=linha).value = self.flightnumber
-        coluna += 1
-        self.trilho = 1
-        self.planilha.cell(column=coluna, row=linha).value = self.trilho
-        coluna += 1
-        self.svctype = str('')
-        self.planilha.cell(column=coluna, row=linha).value = self.svctype
-        coluna += 1
-        self.weekday = str('')
-        self.planilha.cell(column=coluna, row=linha).value = self.weekday
-        coluna -= 10
-        linha += 1
-        self.malha.save(filename=f"Malha SIR - {datetime.date.today()}.xlsx")
+
+        """Escreve os dados na planilha conforme a coluna e a linha"""
+
+        self.malha.save(filename=f'SIR - MALHA {datetime.date.today()}.xlsx')
