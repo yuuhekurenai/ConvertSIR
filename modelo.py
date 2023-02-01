@@ -1,6 +1,5 @@
 from openpyxl import load_workbook, Workbook
 
-import datetime
 # Importa o arquivo tratado.
 from format_tool import formata_txt
 # Importa o pandas
@@ -706,6 +705,9 @@ def model_vcp():
         ['Dept Sta', 'Arvl Sta', 'Dept Day', 'Arvl Day', 'Dept-Hora', 'Arvl-Hora', 'Pax-Subfleet', 'FlightNumbeR',
          'FlightNumberArvl', 'Trilho', 'Svc Type', 'Pax', 'Week-Day']]
     p39 = df_frame66
+
+    """Concatenando todos os dataframes e salvando como excel"""
+
     df_concat1 = pd.concat([p1, p2, p3, p40, p5, p6, p7, p8, p9, p10])
     df_concat2 = pd.concat([p11, p12, p13, p14, p15, p16, p17, p18, p19, p20])
     df_concat3 = pd.concat([p21, p22, p23, p24, p25, p26, p27, p28, p29, p30])
@@ -720,9 +722,12 @@ def model_vcp():
 
     df_geral['Concatenar'] = df_geral['Concatenar'].astype(str)
     df_geral['Chave'] = df_geral['Concatenar'].str.len()
+    df_geral['Data Inicio'] = df_geral['Dept Day'].apply(lambda x: x[0:12])
+    df_geral['Data Final'] = df_geral['Dept Day'].apply(lambda x: x[14:28])
     df_geral.to_excel(f'SIR - MALHA {datetime.date.today()}.xlsx')
     ler = load_workbook(f'SIR - MALHA {datetime.date.today()}.xlsx')
     planilha = ler
     planilha.active.delete_cols(15, 5)
+    planilha.active.delete_cols(1)
     ler.save(f'SIR - MALHA {datetime.date.today()}.xlsx')
 

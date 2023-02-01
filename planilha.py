@@ -4,7 +4,7 @@
     se utilizada para o dimensionamento de demanda.
 
 """
-from openpyxl import Workbook, load_workbook
+from openpyxl import load_workbook
 import datetime
 
 Base = 'VCP'
@@ -16,7 +16,22 @@ time_null = '00:00'
 class Sir:
 
     def __init__(self):
-        # Pequenos parametros
+        """Variáveis que receberam o valor por condição em looping"""
+
+        self.dept_sta = ''
+        self.arvl_sta = ''
+        self.dept_day = ''
+        self.arvl_day = ''
+        self.dept_time = ''
+        self.arvl_time = ''
+        self.sub_fleet = ''
+        self.flight_number = ''
+        self.trilho_set = ''
+        self.svc_type = ''
+        self.week_day = ''
+        self.identity = ''
+        """Pequenos Parametros"""
+
         self.base = Base
         self.tempo = time_null
         self.linha = 2
@@ -28,27 +43,31 @@ class Sir:
 
         self.malha = load_workbook(f'SIR - MALHA {datetime.date.today()}.xlsx')
         self.sir = self.malha.active
-        self.dptsta = self.sir.cell(column=self.coluna, row=self.linha)
+        self.deptsta = self.sir.cell(column=self.coluna, row=self.linha).value
         self.coluna += 1
-        self.arlvsta = self.sir.cell(column=self.coluna, row=self.linha)
+        self.arlvsta = self.sir.cell(column=self.coluna, row=self.linha).value
         self.coluna += 1
-        self.deptday = self.sir.cell(column=self.coluna, row=self.linha)
+        self.deptday = self.sir.cell(column=self.coluna, row=self.linha).value
         self.coluna += 1
-        self.arvlday = self.sir.cell(column=self.coluna, row=self.linha)
+        self.arvlday = self.sir.cell(column=self.coluna, row=self.linha).value
         self.coluna += 1
-        self.depttime = self.sir.cell(column=self.coluna, row=self.linha)
+        self.depttime = self.sir.cell(column=self.coluna, row=self.linha).value
         self.coluna += 1
-        self.arvltime = self.sir.cell(column=self.coluna, row=self.linha)
+        self.arvltime = self.sir.cell(column=self.coluna, row=self.linha).value
         self.coluna += 1
-        self.subfleet = self.sir.cell(column=self.coluna, row=self.linha)
+        self.subfleet = self.sir.cell(column=self.coluna, row=self.linha).value
         self.coluna += 1
-        self.flightnumber = self.sir.cell(column=self.coluna, row=self.linha)
-        self.coluna += 2
-        self.trilho = self.sir.cell(column=self.coluna, row=self.linha)
+        self.flightnumberdept = self.sir.cell(column=self.coluna, row=self.linha).value
         self.coluna += 1
-        self.svctype = self.sir.cell(column=self.coluna, row=self.linha)
+        self.flightnumberarvl = self.sir.cell(column=self.coluna, row=self.linha).value
         self.coluna += 1
-        self.weekday = self.sir.cell(column=self.coluna, row=self.linha)
+        self.trilho = self.sir.cell(column=self.coluna, row=self.linha).value
+        self.coluna += 1
+        self.svctype = self.sir.cell(column=self.coluna, row=self.linha).value
+        self.coluna += 1
+        self.weekday = self.sir.cell(column=self.coluna, row=self.linha).value
+        self.coluna += 1
+        self.identity = self.sir.cell(column=self.coluna, row=self.linha).value
 
         """Cria e nova planilha e escreve o cabeçalho"""
 
@@ -64,6 +83,7 @@ class Sir:
         self.planilha['I1'] = "Trilho"
         self.planilha['J1'] = "Svc Type"
         self.planilha['K1'] = "Week Day"
+        self.planilha['L1'] = "ID"
 
         """Extraindo dados da primeira planilha e transformando para o formato Capacity Planning"""
 
@@ -72,33 +92,144 @@ class EscreverMalha(Sir):
 
     def __init__(self):
         super().__init__()
-        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.base
-        self.escrever_coluna += 1
-        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.arlvsta.value
-        self.escrever_coluna += 1
-        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.deptday.value
-        self.escrever_coluna += 1
-        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.arvlday.value
-        self.escrever_coluna += 1
-        self.planilha.cell(column=self.escrever_coluna,
-                           row=self.escrever_linha).value = f'{self.deptday.value} {self.depttime.value}'
-        self.escrever_coluna += 1
-        self.planilha.cell(column=self.escrever_coluna,
-                           row=self.escrever_linha).value = f'{self.arvlday.value} {self.tempo}'
-        self.escrever_coluna += 1
-        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.subfleet.value
-        self.escrever_coluna += 1
-        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.flightnumber.value
-        self.escrever_coluna += 1
-        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.trilho.value
-        self.escrever_coluna += 1
-        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.svctype.value
-        self.escrever_coluna += 1
-        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.weekday.value
-        self.escrever_coluna -= 10
-        self.escrever_linha += 1
-
 
         """Escreve os dados na planilha conforme a coluna e a linha"""
 
-        self.malha.save(filename=f'SIR - MALHA {datetime.date.today()}.xlsx')
+        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.dept_sta
+        self.escrever_coluna += 1
+        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.arvl_sta
+        self.escrever_coluna += 1
+        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.dept_day
+        self.escrever_coluna += 1
+        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.arvl_day
+        self.escrever_coluna += 1
+        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.dept_time
+        self.escrever_coluna += 1
+        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.arvl_time
+        self.escrever_coluna += 1
+        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.sub_fleet
+        self.escrever_coluna += 1
+        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.flight_number
+        self.escrever_coluna += 1
+        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.trilho_set
+        self.escrever_coluna += 1
+        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.svc_type
+        self.escrever_coluna += 1
+        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.week_day
+        self.escrever_coluna += 1
+        self.planilha.cell(column=self.escrever_coluna, row=self.escrever_linha).value = self.identity
+        self.escrever_coluna -= 11
+        self.escrever_linha += 1
+
+        """Looping que define o valor das variáveis"""
+
+        if self.identity == 43 and self.deptsta != Base:
+            self.dept_sta = self.deptsta
+            self.arvl_sta = Base
+            self.dept_day = self.deptday
+            self.arvl_day = self.arvlday
+            self.dept_time = self.tempo
+            self.arvl_time = f'{self.arvlday} {self.arvltime}'
+            self.sub_fleet = self.subfleet
+            self.flight_number = self.flightnumberarvl
+            self.trilho_set = self.trilho
+            self.svc_type = self.svctype
+            self.week_day = self.weekday
+            self.identity = self.identity
+            EscreverMalha()
+
+        elif self.identity == 43 and self.deptsta == Base:
+
+            self.dept_sta = Base
+            self.arvl_sta = self.arlvsta
+            self.dept_day = self.deptday
+            self.arvl_day = self.arvlday
+            self.dept_time = f'{self.dept_day} {self.dept_time}'
+            self.arvl_time = self.tempo
+            self.sub_fleet = self.subfleet
+            self.flight_number = self.flightnumberdept
+            self.trilho = self.trilho
+            self.svc_type = self.svctype
+            self.week_day = self.weekday
+            self.identity = self.identity
+            EscreverMalha()
+
+        elif self.identity == 44 and self.deptsta != Base:
+
+            self.dept_sta = self.deptsta
+            self.arvl_sta = Base
+            self.dept_day = self.deptday
+            self.arvl_day = self.arvlday
+            self.dept_time = self.tempo
+            self.arvl_time = f'{self.arvlday} {self.arvltime}'
+            self.sub_fleet = self.subfleet
+            self.flight_number = self.flightnumberarvl
+            self.trilho = self.trilho
+            self.svc_type = self.svctype
+            self.week_day = self.weekday
+            self.identity = self.identity
+            EscreverMalha()
+
+        elif self.identity == 44 and self.deptsta == Base:
+
+            self.dept_sta = Base
+            self.arvl_sta = self.arlvsta
+            self.dept_day = self.deptday
+            self.arvl_day = self.arvlday
+            self.dept_time = f'{self.dept_day} {self.dept_time}'
+            self.arvl_time = self.tempo
+            self.sub_fleet = self.subfleet
+            self.flight_number = self.flightnumberdept
+            self.trilho = self.trilho
+            self.svc_type = self.svctype
+            self.week_day = self.weekday
+            self.identity = self.identity
+            EscreverMalha()
+
+        elif self.identity == 45 and self.deptsta != Base:
+
+            self.dept_sta = self.deptsta
+            self.arvl_sta = Base
+            self.dept_day = self.deptday
+            self.arvl_day = self.arvlday
+            self.dept_time = self.tempo
+            self.arvl_time = f'{self.arvlday} {self.arvltime}'
+            self.sub_fleet = self.subfleet
+            self.flight_number = self.flightnumberarvl
+            self.trilho = self.trilho
+            self.svc_type = self.svctype
+            self.week_day = self.weekday
+            self.identity = self.identity
+            EscreverMalha()
+
+        elif self.identity == 46 and self.deptsta != Base and self.arlvsta != Base:
+            """Escreve a Saida"""
+            self.dept_sta = self.deptsta
+            self.arvl_sta = Base
+            self.dept_day = self.deptday
+            self.arvl_day = self.arvlday
+            self.dept_time = self.tempo
+            self.arvl_time = f'{self.arvlday} {self.arvltime}'
+            self.sub_fleet = self.subfleet
+            self.flight_number = self.flightnumberarvl
+            self.trilho = self.trilho
+            self.svc_type = self.svctype
+            self.week_day = self.weekday
+            self.identity = self.identity
+            EscreverMalha()
+
+            """Escreve a Saida"""
+            self.dept_sta = Base
+            self.arvl_sta = self.arlvsta
+            self.dept_day = self.deptday
+            self.arvl_day = self.arvlday
+            self.dept_time = f'{self.dept_day} {self.dept_time}'
+            self.arvl_time = self.tempo
+            self.sub_fleet = self.subfleet
+            self.flight_number = self.flightnumberdept
+            self.trilho = self.trilho
+            self.svc_type = self.svctype
+            self.week_day = self.weekday
+            self.identity = self.identity
+            EscreverMalha()
+            self.malha.save(filename=f'SIR - MALHA {datetime.date.today()}.xlsx')

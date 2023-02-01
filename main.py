@@ -1,3 +1,7 @@
 from modelo import model_vcp
+from planilha import Sir, EscreverMalha
 
-model_vcp()
+if __name__ == "__main__":
+    model_vcp()
+    Sir()
+    EscreverMalha()
