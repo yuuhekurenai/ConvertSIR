@@ -37,19 +37,35 @@ def model_vcp():
 
     )
 
-    # Imprime as linhas concactena e gera as quatro Keys para filtro (Key, KeyX, Kdept e Karvl)
-    df['Concatenar'] = df['Arvl Sta'].astype(str) + df['Dept Sta'].astype(str) + df['Dept Day'].astype(str) + df[
-        'Week-Day'].astype(str) + df['Pax-Subfleet'].astype(str) + df['Pax-Subfleet'].astype(str) + df[
-                           'Arvl-Hora'].astype(str) + df['Dept-Hora'].astype(str) + df['Svc Type'].astype(str)
+    # Concatena as colunas relevantes para gerar a chave de filtro
+    df['Concatenar'] = (
+            df['Arvl Sta'].astype(str) +
+            df['Dept Sta'].astype(str) +
+            df['Dept Day'].astype(str) +
+            df['Week-Day'].astype(str) +
+            df['Pax-Subfleet'].astype(str) +
+            df['Pax-Subfleet'].astype(str) +
+            df['Arvl-Hora'].astype(str) +
+            df['Dept-Hora'].astype(str) +
+            df['Svc Type'].astype(str)
+    )
 
+    # Converte a coluna 'Concatenar' para tipo string, se necessário
     df['Concatenar'] = df['Concatenar'].astype(str)
+
+    # Gera a coluna 'Key' com o tamanho da string em 'Concatenar'
     df['Key'] = df['Concatenar'].str.len()
-    df['KeyX'] = df['Svc Type'].astype(str)
-    df['KeyX'] = df['KeyX'].str.len()
-    df['Kdept'] = df['Dept-Hora'].astype(str)
-    df['Kdept'] = df['Kdept'].str.len()
-    df['Karvl'] = df['Arvl-Hora'].astype(str)
-    df['Karvl'] = df['Karvl'].str.len()
+
+    # Gera a coluna 'KeyX' com o tamanho da string em 'Svc Type'
+    df['KeyX'] = df['Svc Type'].astype(str).str.len()
+
+    # Gera a coluna 'Kdept' com o tamanho da string em 'Dept-Hora'
+    df['Kdept'] = df['Dept-Hora'].astype(str).str.len()
+
+    # Gera a coluna 'Karvl' com o tamanho da string em 'Arvl-Hora'
+    df['Karvl'] = df['Arvl-Hora'].astype(str).str.len()
+
+    # Armazena o DataFrame original em 'df_orig'
     df_orig = df
 
     # Com as Keys geradas, agora é possível buscar todos os padrões e tratá-los.
@@ -708,26 +724,33 @@ def model_vcp():
 
     """Concatenando todos os dataframes e salvando como excel"""
 
-    df_concat1 = pd.concat([p1, p2, p3, p40, p5, p6, p7, p8, p9, p10])
-    df_concat2 = pd.concat([p11, p12, p13, p14, p15, p16, p17, p18, p19, p20])
-    df_concat3 = pd.concat([p21, p22, p23, p24, p25, p26, p27, p28, p29, p30])
-    df_concat4 = pd.concat([p31, p32, p33, p34, p35, p36, p37, p38, p39])
-    df_geral = pd.concat([df_concat1, df_concat2, df_concat3, df_concat4])
-    df_geral = df_geral.sort_index()
-    df_geral['Concatenar'] = df_geral['Arvl Sta'].astype(str) + df_geral['Dept Sta'].astype(str) + df_geral[
-        'Dept Day'].astype(str) + df_geral['Week-Day'].astype(str) + df_geral['Pax-Subfleet'].astype(str) + df_geral[
-                                 'Pax-Subfleet'].astype(str) + df_geral['Arvl-Hora'].astype(str) + df_geral[
-                                 'Dept-Hora'].astype(str) + df_geral['Svc Type'].astype(str) + df_geral[
-                                 'FlightNumbeR'].astype(str) + df_geral['FlightNumberArvl'].astype(str)
+    # Concatenar os dataframes
+    dfs = [p1, p2, p3, p40, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20,
+           p21, p22, p23, p24, p25, p26, p27, p28, p29, p30, p31, p32, p33, p34, p35, p36, p37, p38, p39]
+    df_geral = pd.concat(dfs)  # Concatenar os dataframes em um único dataframe
+    df_geral = df_geral.sort_index()  # Ordenar o dataframe pelos índices
 
+    # Criar a coluna 'Concatenar'
+    concat_cols = ['Arvl Sta', 'Dept Sta', 'Dept Day', 'Week-Day', 'Pax-Subfleet',
+                   'Arvl-Hora', 'Dept-Hora', 'Svc Type', 'FlightNumbeR', 'FlightNumberArvl']
+    df_geral['Concatenar'] = df_geral[concat_cols].astype(str).sum(axis=1)
+
+    # Realizar as conversões necessárias
     df_geral['Concatenar'] = df_geral['Concatenar'].astype(str)
     df_geral['Chave'] = df_geral['Concatenar'].str.len()
     df_geral['Data Inicio'] = df_geral['Dept Day'].apply(lambda x: x[0:12])
     df_geral['Data Final'] = df_geral['Dept Day'].apply(lambda x: x[14:28])
-    df_geral.to_excel(f'SIR - MALHA {datetime.date.today()}.xlsx')
-    ler = load_workbook(f'SIR - MALHA {datetime.date.today()}.xlsx')
-    planilha = ler
-    planilha.active.delete_cols(15, 5)
-    planilha.active.delete_cols(1)
-    ler.save(f'SIR - MALHA {datetime.date.today()}.xlsx')
+
+    # Salvar o dataframe em um arquivo Excel
+    filename = f'SIR - MALHA {datetime.date.today()}.xlsx'
+    df_geral.to_excel(filename)
+
+    # Carregar o arquivo Excel e excluir colunas desnecessárias
+    wb = load_workbook(filename)
+    ws = wb.active
+    ws.delete_cols(15, 5)
+    ws.delete_cols(1)
+
+    # Salvar o arquivo Excel modificado
+    wb.save(filename)
 
